@@ -1,0 +1,52 @@
+*{margin:0;padding:0;box-sizing:border-box}
+body{overflow:hidden;background:#000;font-family:'Segoe UI',system-ui,sans-serif;color:#fff;user-select:none}
+canvas{display:block}
+
+/* HUD */
+#hud{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:linear-gradient(180deg,rgba(0,0,0,.7) 0%,transparent 100%);z-index:10;pointer-events:none}
+#hud>div{pointer-events:auto}
+.stat{display:inline-flex;align-items:center;gap:6px;margin:0 12px;font-size:15px;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,.6)}
+.stat .icon{font-size:20px}
+.stat .val{color:#ffd700}
+#health-bar-bg{width:120px;height:10px;background:rgba(255,255,255,.15);border-radius:5px;overflow:hidden}
+#health-bar{height:100%;background:linear-gradient(90deg,#ff4444,#ff6b6b);border-radius:5px;transition:width .3s}
+
+/* Controls */
+#controls{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:10px;padding:12px 20px;background:linear-gradient(0deg,rgba(0,0,0,.7) 0%,transparent 100%);z-index:10;pointer-events:none}
+#controls>button{pointer-events:auto}
+.ctrl-btn{padding:8px 18px;border:1px solid rgba(255,255,255,.25);border-radius:8px;background:rgba(255,255,255,.08);color:#fff;font-size:13px;font-weight:600;cursor:pointer;backdrop-filter:blur(8px);transition:all .2s}
+.ctrl-btn:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.5)}
+.ctrl-btn.active{background:rgba(100,200,255,.2);border-color:rgba(100,200,255,.6)}
+.ctrl-btn.wave-btn{background:rgba(255,200,50,.15);border-color:rgba(255,200,50,.4);color:#ffd700;animation:wavePulse 1.5s infinite}
+.ctrl-btn.wave-btn:hover{background:rgba(255,200,50,.3)}
+@keyframes wavePulse{0%,100%{box-shadow:0 0 4px rgba(255,200,50,.2)}50%{box-shadow:0 0 14px rgba(255,200,50,.5)}}
+
+/* Tower Panel */
+#tower-panel{position:fixed;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:10}
+.tower-card{width:72px;padding:8px 4px;border:1px solid rgba(255,255,255,.15);border-radius:10px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);text-align:center;cursor:pointer;transition:all .2s}
+.tower-card:hover{border-color:rgba(100,200,255,.5);background:rgba(100,200,255,.1)}
+.tower-card.selected{border-color:#64c8ff;background:rgba(100,200,255,.15);box-shadow:0 0 12px rgba(100,200,255,.3)}
+.tower-card .t-icon{font-size:28px;margin-bottom:2px}
+.tower-card .t-name{font-size:9px;opacity:.7;text-transform:uppercase;letter-spacing:.5px}
+.tower-card .t-cost{font-size:11px;color:#ffd700;font-weight:700}
+
+/* Wave Banner */
+#wave-banner{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;font-weight:800;text-transform:uppercase;letter-spacing:4px;opacity:0;z-index:20;pointer-events:none;text-shadow:0 0 30px rgba(100,200,255,.6);transition:opacity .4s}
+
+/* Game Over / Level Complete Overlay */
+#overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:30;flex-direction:column;gap:16px}
+#overlay.show{display:flex}
+#overlay h1{font-size:52px;font-weight:800;background:linear-gradient(135deg,#64c8ff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#overlay p{font-size:18px;opacity:.7}
+#overlay button{margin-top:8px;padding:12px 36px;border:none;border-radius:10px;background:linear-gradient(135deg,#64c8ff,#a78bfa);color:#fff;font-size:16px;font-weight:700;cursor:pointer;transition:transform .2s}
+#overlay button:hover{transform:scale(1.05)}
+
+/* Upgrade tooltip */
+#upgrade-tip{position:fixed;display:none;padding:10px 14px;background:rgba(0,0,0,.85);border:1px solid rgba(100,200,255,.3);border-radius:8px;font-size:12px;z-index:25;pointer-events:none;line-height:1.6}
+#upgrade-tip.show{display:block}
+
+/* Level indicator */
+#level-display{position:fixed;left:20px;top:50%;transform:translateY(-50%);z-index:10;display:flex;flex-direction:column;gap:6px}
+.lvl-pip{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:transparent;transition:all .3s}
+.lvl-pip.done{background:#64c8ff;border-color:#64c8ff}
+.lvl-pip.current{border-color:#ffd700;box-shadow:0 0 8px rgba(255,215,0,.5)}

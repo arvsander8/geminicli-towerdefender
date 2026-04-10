@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Tower Defense</title>
+<link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+
+<!-- HUD -->
+<div id="hud">
+  <div>
+    <span class="stat"><span class="icon">💎</span><span class="val" id="gold">150</span></span>
+    <span class="stat"><span class="icon">🏆</span><span class="val" id="score">0</span></span>
+    <span class="stat"><span class="icon">🌊</span>Wave <span class="val" id="wave-num">1</span></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span class="stat"><span class="icon">❤️</span></span>
+    <div id="health-bar-bg"><div id="health-bar" style="width:100%"></div></div>
+    <span class="stat"><span class="val" id="hp-text">20/20</span></span>
+  </div>
+</div>
+
+<!-- Tower selection panel -->
+<div id="tower-panel"></div>
+
+<!-- Level pips -->
+<div id="level-display"></div>
+
+<!-- Controls -->
+<div id="controls">
+  <button class="ctrl-btn wave-btn" id="btn-wave">⚔️ Send Wave</button>
+  <button class="ctrl-btn" id="btn-pause">⏸ Pause</button>
+  <button class="ctrl-btn" id="btn-resume">▶ Resume</button>
+  <button class="ctrl-btn" id="btn-restart">🔄 Restart</button>
+  <button class="ctrl-btn" id="btn-speed">⏩ 1x</button>
+</div>
+
+<!-- Wave banner -->
+<div id="wave-banner"></div>
+
+<!-- Overlay -->
+<div id="overlay">
+  <h1 id="overlay-title">Game Over</h1>
+  <p id="overlay-sub"></p>
+  <button id="overlay-btn">Play Again</button>
+</div>
+
+<!-- Upgrade tooltip -->
+<div id="upgrade-tip"></div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
