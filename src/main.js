@@ -1,20 +1,24 @@
 import * as THREE from 'three';
-import { state, resetState } from './state.js';
-import { GRID, TOWER_DEFS, generateWaves } from './config.js';
+import { state, resetState } from './core/state.js';
+import { GRID, TOWER_DEFS } from './core/config.js';
 import {
   scene, camera, renderer, controls,
   raycaster, placementPlane, ghost, rangeRing,
-  worldToGrid, updateBackground
-} from './engine.js';
+  updateBackground
+} from './core/engine.js';
 import {
   buildTowerPanel, buildLevelDisplay, updateHUD, updateWaveBtn,
   showBanner, hideOverlay, showUpgradeTooltip, hideUpgradeTooltip
 } from './ui.js';
-import {
-  placeTower, upgradeTower, startWave,
-  updateEnemies, updateTowers, updateProjectiles,
-  updateParticles, updateWaveSpawner, isValidPlacement
-} from './logic.js';
+import { placeTower, upgradeTower } from './entities/Tower.js';
+import { updateTowers } from './systems/TowerSystem.js';
+import { updateEnemies } from './systems/EnemySystem.js';
+import { updateProjectiles } from './systems/ProjectileSystem.js';
+import { updateParticles } from './systems/ParticleSystem.js';
+import { updateWaveSpawner, startWave } from './systems/WaveSystem.js';
+import { createPathMesh, buildPathCurve } from './systems/MapSystem.js';
+import { levels } from './levels/index.js';
+import { worldToGrid, isValidPlacement } from './utils/grid.js';
 
 const mouse = new THREE.Vector2();
 
@@ -30,10 +34,10 @@ function onMouseMove(e) {
     if (intersect) {
       const [gx, gz] = worldToGrid(intersect.x, intersect.z);
       if (gx >= 0 && gx < GRID && gz >= 0 && gz < GRID) {
-        const pos = new THREE.Vector3((gx - GRID/2)*2 + 1, 0, (gz - GRID/2)*2 + 1);
+        const pos = new THREE.Vector3((gx - GRID / 2) * 2 + 1, 0, (gz - GRID / 2) * 2 + 1);
         ghost.position.copy(pos);
         ghost.visible = true;
-        ghost.material.color.set(isValidPlacement(gx, gz, GRID) ? 0x44ff66 : 0xff4444);
+        ghost.material.color.set(isValidPlacement(gx, gz, state.pathCurve) ? 0x44ff66 : 0xff4444);
 
         const def = TOWER_DEFS.find(d => d.id === state.placingTower);
         if (def) {
@@ -64,7 +68,7 @@ function onClick(e) {
     if (intersect) {
       const [gx, gz] = worldToGrid(intersect.x, intersect.z);
       const def = TOWER_DEFS.find(d => d.id === state.placingTower);
-      if (def) placeTower(def, gx, gz, GRID);
+      if (def) placeTower(def, gx, gz, GRID, state.pathCurve);
     }
   } else {
     raycaster.setFromCamera(mouse, camera);
@@ -148,6 +152,17 @@ window.addEventListener('keydown', e => {
   }
 });
 
+function loadLevel(levelIndex) {
+  const levelDef = levels[levelIndex];
+  state.level = levelIndex;
+  state.currentWaves = levelDef.waves;
+  state.pathCurve = buildPathCurve(levelDef.map.pathNodes);
+  createPathMesh(levelDef.map.pathNodes);
+  state.gold = levelDef.startingGold || state.gold;
+  state.hp = levelDef.startingHp || state.hp;
+  state.maxHp = levelDef.startingHp || state.maxHp;
+}
+
 function restartGame() {
   state.towers.forEach(t => scene.remove(t.mesh));
   state.enemies.forEach(e => { if (e.mesh.parent) scene.remove(e.mesh); });
@@ -155,7 +170,7 @@ function restartGame() {
   state.particles.forEach(p => scene.remove(p.mesh));
 
   resetState();
-  state.currentWaves = generateWaves(0);
+  loadLevel(0);
 
   hideOverlay();
   ghost.visible = false;
@@ -168,7 +183,7 @@ function restartGame() {
   document.getElementById('btn-pause').classList.remove('active');
   document.getElementById('btn-resume').classList.remove('active');
 
-  showBanner('Level 1', 2000);
+  showBanner(`Level 1: ${levels[0].name}`, 2000);
   setTimeout(() => startWave(), 2500);
 }
 
@@ -186,8 +201,8 @@ function animate() {
   updateBackground(elapsed, state.level);
 
   if (!state.paused && state.gameState === 'playing') {
-    updateWaveSpawner(dt);
-    updateEnemies(dt);
+    updateWaveSpawner(dt, state.pathCurve);
+    updateEnemies(dt, state.pathCurve);
     updateTowers(dt);
     updateProjectiles(dt);
     updateParticles(dt);
@@ -216,8 +231,8 @@ function init() {
     }
   });
 
+  loadLevel(0);
   buildLevelDisplay();
-  state.currentWaves = generateWaves(0);
   updateHUD();
   updateWaveBtn();
   showBanner('Tower Defense', 2000);

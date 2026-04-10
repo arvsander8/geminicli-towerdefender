@@ -6,6 +6,8 @@ export const state = {
   waveActive: false, waveQueue: [], nextWaveReady: true,
   gameState: 'playing', // playing | gameover | victory
   waveTimer: 0, waveSpawned: 0, waveTotal: 0, waveDone: 0,
+  currentWaves: [],
+  pathCurve: null,
 };
 
 export function resetState() {
@@ -31,4 +33,6 @@ export function resetState() {
   state.waveSpawned = 0;
   state.waveTotal = 0;
   state.waveDone = 0;
+  state.currentWaves = [];
+  state.pathCurve = null;
 }

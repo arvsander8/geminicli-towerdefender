@@ -1,7 +1,6 @@
 export const GRID = 16;
 export const CELL = 2;
 export const HALF = GRID * CELL / 2;
-export const TOTAL_LEVELS = 5;
 
 export const TOWER_DEFS = [
   { id:'arrow', name:'Arrow', icon:'🏹', cost:50, color:0x44cc66, range:6, damage:12, rate:0.6, projectileSpeed:30, projectileColor:0x88ff88,
@@ -25,24 +24,3 @@ export const ENEMY_DEFS = [
   { id:'flyer', name:'Flyer', color:0xaaccff, hp:50, speed:4, reward:15, size:0.35, flying:true },
 ];
 
-export function generateWaves(level) {
-  const waves = [];
-  const base = 5 + level * 2;
-  for (let w = 0; w < 3 + level; w++) {
-    const enemies = [];
-    const count = base + w * 3;
-    for (let i = 0; i < count; i++) {
-      let type;
-      const r = Math.random();
-      if (w === 2 + level && i === count - 1) type = 'boss';
-      else if (level >= 3 && r < 0.1) type = 'healer';
-      else if (level >= 2 && r < 0.2) type = 'flyer';
-      else if (r < 0.25 + level * 0.03) type = 'tank';
-      else if (r < 0.5) type = 'fast';
-      else type = 'basic';
-      enemies.push({ type, delay: i * (0.5 - Math.min(level * 0.03, 0.25)) });
-    }
-    waves.push(enemies);
-  }
-  return waves;
-}

@@ -1,5 +1,6 @@
-import { state } from './state.js';
-import { TOWER_DEFS, TOTAL_LEVELS } from './config.js';
+import { state } from './core/state.js';
+import { TOWER_DEFS } from './core/config.js';
+import { levels } from './levels/index.js';
 
 export function updateHUD() {
   document.getElementById('gold').textContent = state.gold;
@@ -38,7 +39,7 @@ export function buildTowerPanel(onTowerClick) {
 export function buildLevelDisplay() {
   const container = document.getElementById('level-display');
   container.innerHTML = '';
-  for (let i = 0; i < TOTAL_LEVELS; i++) {
+  for (let i = 0; i < levels.length; i++) {
     const pip = document.createElement('div');
     pip.className = 'lvl-pip';
     if (i < state.level) pip.classList.add('done');
