@@ -4,7 +4,7 @@ import { GRID, TOWER_DEFS, generateWaves } from './config.js';
 import {
   scene, camera, renderer, controls,
   raycaster, placementPlane, ghost, rangeRing,
-  worldToGrid, isValidPlacement, updateBackground
+  worldToGrid, updateBackground
 } from './engine.js';
 import {
   buildTowerPanel, buildLevelDisplay, updateHUD, updateWaveBtn,
@@ -13,7 +13,7 @@ import {
 import {
   placeTower, upgradeTower, startWave,
   updateEnemies, updateTowers, updateProjectiles,
-  updateParticles, updateWaveSpawner
+  updateParticles, updateWaveSpawner, isValidPlacement
 } from './logic.js';
 
 const mouse = new THREE.Vector2();
