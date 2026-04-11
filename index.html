@@ -35,6 +35,25 @@
   <button class="ctrl-btn" id="btn-resume">▶ Resume</button>
   <button class="ctrl-btn" id="btn-restart">🔄 Restart</button>
   <button class="ctrl-btn" id="btn-speed">⏩ 1x</button>
+  <button class="ctrl-btn" id="btn-editor">🛠 Editor</button>
+</div>
+
+<!-- Editor controls -->
+<div id="editor-controls" style="display:none">
+  <button class="ctrl-btn" id="edit-undo">⬅ Undo</button>
+  <button class="ctrl-btn" id="edit-clear">🗑 Clear</button>
+  <button class="ctrl-btn wave-btn" id="edit-export">💾 Export</button>
+  <button class="ctrl-btn" id="edit-exit">🚪 Exit Editor</button>
+</div>
+
+<!-- Export Modal -->
+<div id="export-modal" class="modal">
+  <div class="modal-content">
+    <h2>Export Path</h2>
+    <p>Copy this code to your map file:</p>
+    <textarea id="export-text" readonly></textarea>
+    <button class="ctrl-btn" id="close-modal">Close</button>
+  </div>
 </div>
 
 <!-- Wave banner -->

@@ -8,6 +8,8 @@ export const state = {
   waveTimer: 0, waveSpawned: 0, waveTotal: 0, waveDone: 0,
   currentWaves: [],
   pathCurve: null,
+  editorMode: false,
+  editorNodes: [],
 };
 
 export function resetState() {
@@ -35,4 +37,6 @@ export function resetState() {
   state.waveDone = 0;
   state.currentWaves = [];
   state.pathCurve = null;
+  state.editorMode = false;
+  state.editorNodes = [];
 }

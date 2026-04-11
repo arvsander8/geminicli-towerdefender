@@ -17,6 +17,7 @@ import { updateProjectiles } from './systems/ProjectileSystem.js';
 import { updateParticles } from './systems/ParticleSystem.js';
 import { updateWaveSpawner, startWave } from './systems/WaveSystem.js';
 import { createPathMesh, buildPathCurve } from './systems/MapSystem.js';
+import { toggleEditor, addEditorNode, undoEditorNode, clearEditorNodes, exportPath } from './systems/EditorSystem.js';
 import { levels } from './levels/index.js';
 import { worldToGrid, isValidPlacement } from './utils/grid.js';
 
@@ -25,6 +26,25 @@ const mouse = new THREE.Vector2();
 function onMouseMove(e) {
   mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+  if (state.editorMode) {
+    raycaster.setFromCamera(mouse, camera);
+    const intersect = new THREE.Vector3();
+    raycaster.ray.intersectPlane(placementPlane, intersect);
+
+    if (intersect) {
+      const [gx, gz] = worldToGrid(intersect.x, intersect.z);
+      if (gx >= 0 && gx < GRID && gz >= 0 && gz < GRID) {
+        const pos = new THREE.Vector3((gx - GRID / 2) * 2 + 1, 0, (gz - GRID / 2) * 2 + 1);
+        ghost.position.copy(pos);
+        ghost.visible = true;
+        ghost.material.color.set(0x64c8ff);
+      } else {
+        ghost.visible = false;
+      }
+    }
+    return;
+  }
 
   if (state.placingTower) {
     raycaster.setFromCamera(mouse, camera);
@@ -55,10 +75,23 @@ function onMouseMove(e) {
 }
 
 function onClick(e) {
-  if (state.gameState !== 'playing') return;
+  if (state.gameState !== 'playing' && !state.editorMode) return;
 
   mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+  if (state.editorMode) {
+    raycaster.setFromCamera(mouse, camera);
+    const intersect = new THREE.Vector3();
+    raycaster.ray.intersectPlane(placementPlane, intersect);
+    if (intersect) {
+      const [gx, gz] = worldToGrid(intersect.x, intersect.z);
+      if (gx >= 0 && gx < GRID && gz >= 0 && gz < GRID) {
+        addEditorNode(gx, gz);
+      }
+    }
+    return;
+  }
 
   if (state.placingTower) {
     raycaster.setFromCamera(mouse, camera);
@@ -120,6 +153,18 @@ document.getElementById('btn-speed').addEventListener('click', () => {
   document.getElementById('btn-speed').textContent = `⏩ ${state.speed}x`;
 });
 
+document.getElementById('btn-editor').addEventListener('click', () => toggleEditor(true));
+document.getElementById('edit-undo').addEventListener('click', undoEditorNode);
+document.getElementById('edit-clear').addEventListener('click', clearEditorNodes);
+document.getElementById('edit-export').addEventListener('click', exportPath);
+document.getElementById('edit-exit').addEventListener('click', () => {
+  toggleEditor(false);
+  loadLevel(state.level); // Restore path
+});
+document.getElementById('close-modal').addEventListener('click', () => {
+  document.getElementById('export-modal').style.display = 'none';
+});
+
 window.addEventListener('mousemove', onMouseMove);
 window.addEventListener('click', onClick);
 window.addEventListener('resize', () => {
@@ -130,11 +175,16 @@ window.addEventListener('resize', () => {
 
 window.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    state.placingTower = null;
-    ghost.visible = false;
-    rangeRing.visible = false;
-    document.querySelectorAll('.tower-card').forEach(c => c.classList.remove('selected'));
-    hideUpgradeTooltip();
+    if (state.editorMode) {
+      toggleEditor(false);
+      loadLevel(state.level);
+    } else {
+      state.placingTower = null;
+      ghost.visible = false;
+      rangeRing.visible = false;
+      document.querySelectorAll('.tower-card').forEach(c => c.classList.remove('selected'));
+      hideUpgradeTooltip();
+    }
   }
   if (e.key === ' ') {
     e.preventDefault();
