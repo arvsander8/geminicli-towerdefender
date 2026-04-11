@@ -3,6 +3,7 @@ import { spawnEnemy } from '../entities/Enemy.js';
 import { levels } from '../levels/index.js';
 import { showBanner, showOverlay, updateHUD, updateWaveBtn, buildLevelDisplay } from '../ui.js';
 import { buildPathCurve, createPathMesh } from './MapSystem.js';
+import { scene } from '../core/engine.js';
 
 export function updateWaveSpawner(dt, pathCurve) {
   if (!state.waveActive || state.waveQueue.length === 0) return;
@@ -18,8 +19,20 @@ export function updateWaveSpawner(dt, pathCurve) {
 export function startWave() {
   if (state.waveActive) return;
 
+  // Transition to next level if all waves are done
   if (state.wave >= state.currentWaves.length) {
     if (state.level < levels.length - 1) {
+      // Clear entities for the new level/map
+      state.towers.forEach(t => scene.remove(t.mesh));
+      state.enemies.forEach(e => { if (e.mesh.parent) scene.remove(e.mesh); });
+      state.projectiles.forEach(p => scene.remove(p.mesh));
+      state.particles.forEach(p => scene.remove(p.mesh));
+
+      state.towers = [];
+      state.enemies = [];
+      state.projectiles = [];
+      state.particles = [];
+
       state.level++;
       state.wave = 0;
 
@@ -39,7 +52,7 @@ export function startWave() {
       updateWaveBtn();
     } else {
       state.gameState = 'victory';
-      showOverlay('Victory!', `Final Score: ${state.score}`);
+      showOverlay('VICTORY!', `YOU WIN! Final Score: ${state.score}`);
     }
     return;
   }

@@ -75,9 +75,15 @@ export function updateWaveBtn() {
     const nextIdx = state.wave;
     const total = state.currentWaves?.length || 0;
     if (nextIdx >= total) {
-      btn.textContent = '🏆 All Waves Done!';
-      btn.style.opacity = '0.5';
-      btn.style.pointerEvents = 'none';
+      if (state.level < levels.length - 1) {
+        btn.textContent = '👉 Next Level';
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
+      } else {
+        btn.textContent = '🏆 All Levels Done!';
+        btn.style.opacity = '0.5';
+        btn.style.pointerEvents = 'none';
+      }
     } else {
       btn.textContent = `⚔️ Send Wave ${nextIdx + 1}/${total}`;
       btn.style.opacity = '1';
