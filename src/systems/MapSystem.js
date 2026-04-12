@@ -16,15 +16,31 @@ export function createPathMesh(pathNodes) {
   }
 
   const curve = buildPathCurve(pathNodes);
-  const tubeGeo = new THREE.TubeGeometry(curve, 120, 1.0, 12, false);
-  const tubeMat = new THREE.MeshStandardMaterial({
-    color: 0x3388cc, roughness: 0.4, metalness: 0.3,
-    emissive: 0x1a66aa, emissiveIntensity: 0.6
+  
+  // Create a flat road shape
+  const roadWidth = 1.4;
+  const roadShape = new THREE.Shape([
+    new THREE.Vector2(-roadWidth / 2, 0),
+    new THREE.Vector2(roadWidth / 2, 0),
+    new THREE.Vector2(roadWidth / 2, 0.1),
+    new THREE.Vector2(-roadWidth / 2, 0.1),
+  ]);
+
+  const extrudeSettings = {
+    steps: 150,
+    bevelEnabled: false,
+    extrudePath: curve
+  };
+
+  const roadGeo = new THREE.ExtrudeGeometry(roadShape, extrudeSettings);
+  const roadMat = new THREE.MeshStandardMaterial({
+    color: 0x223344, roughness: 0.8, metalness: 0.2,
+    emissive: 0x112233, emissiveIntensity: 0.2
   });
-  const tube = new THREE.Mesh(tubeGeo, tubeMat);
-  tube.position.y = 0.03;
-  tube.receiveShadow = true;
-  pathGroup.add(tube);
+  const road = new THREE.Mesh(roadGeo, roadMat);
+  road.position.y = 0.01;
+  road.receiveShadow = true;
+  pathGroup.add(road);
 
   const points = curve.getPoints(300);
   const lineGeo = new THREE.BufferGeometry().setFromPoints(points);

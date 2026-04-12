@@ -18,6 +18,12 @@ export class BaseEnemy {
     this.mesh = this.createMesh();
     const startPos = pathCurve.getPoint(0);
     this.mesh.position.copy(startPos);
+    // Raise body slightly to sit on road (road is 0.1 high)
+    if (!this.def.flying) {
+      this.mesh.position.y = 0.1 + this.def.size;
+    } else {
+      this.mesh.position.y = 2;
+    }
     scene.add(this.mesh);
   }
 
@@ -43,14 +49,15 @@ export class BaseEnemy {
       new THREE.PlaneGeometry(1, 0.12),
       new THREE.MeshBasicMaterial({ color: 0x333333, side: THREE.DoubleSide })
     );
-    hbBg.position.y = (this.def.flying ? 2 : this.def.size + 0.8);
+    // Relative to the group position (which is at the center of the enemy body)
+    hbBg.position.y = this.def.size + 0.5;
     group.add(hbBg);
 
     const hbFill = new THREE.Mesh(
       new THREE.PlaneGeometry(1, 0.12),
       new THREE.MeshBasicMaterial({ color: 0x44ff44, side: THREE.DoubleSide })
     );
-    hbFill.position.y = (this.def.flying ? 2 : this.def.size + 0.8);
+    hbFill.position.y = this.def.size + 0.5;
     hbFill.position.z = 0.01;
     group.add(hbFill);
 
@@ -86,8 +93,8 @@ export class BaseEnemy {
     }
 
     const pos = this.curve.getPoint(this.t);
-    const flyY = this.def.flying ? 2 : 0;
-    this.mesh.position.set(pos.x, pos.y + flyY, pos.z);
+    const bodyY = this.def.flying ? 2 : 0.1 + this.def.size;
+    this.mesh.position.set(pos.x, bodyY, pos.z);
 
     const nextPos = this.curve.getPoint(Math.min(this.t + 0.01, 1));
     this.mesh.lookAt(nextPos.x, this.mesh.position.y, nextPos.z);
