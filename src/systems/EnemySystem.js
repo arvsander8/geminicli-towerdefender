@@ -43,32 +43,15 @@ export function onEnemyKilledOrLeaked() {
   updateWaveBtn();
 }
 
-export function updateEnemies(dt, pathCurve) {
+export function updateEnemies(dt) {
   state.enemies.forEach(enemy => {
     if (enemy.dead) return;
 
-    if (enemy.def.heals) {
-      state.enemies.forEach(other => {
-        if (other === enemy || other.dead) return;
-        if (enemy.mesh.position.distanceTo(other.mesh.position) < 3) {
-          other.hp = Math.min(other.hp + 5 * dt, other.maxHp);
-        }
-      });
-    }
+    enemy.update(dt);
 
-    if (enemy.slowTimer > 0) {
-      enemy.slowTimer -= dt;
-    } else {
-      enemy.slowFactor = 1;
-    }
-
-    const pathLen = pathCurve.getLength();
-    const speed = enemy.speed * enemy.slowFactor / pathLen;
-    enemy.t += speed * dt;
-
-    if (enemy.t >= 1) {
-      state.hp--;
+    if (enemy.t >= 1 && !enemy.dead) {
       enemy.dead = true;
+      state.hp--;
       scene.remove(enemy.mesh);
       spawnParticles(enemy.mesh.position.clone(), 0xff4444, 8);
       updateHUD();
@@ -78,29 +61,9 @@ export function updateEnemies(dt, pathCurve) {
         state.gameState = 'gameover';
         showOverlay('Game Over', `Score: ${state.score} | Level: ${state.level + 1}`);
       }
-      return;
-    }
-
-    const pos = pathCurve.getPoint(enemy.t);
-    const flyY = enemy.def.flying ? 2 : 0;
-    enemy.mesh.position.set(pos.x, pos.y + flyY, pos.z);
-
-    const nextPos = pathCurve.getPoint(Math.min(enemy.t + 0.01, 1));
-    enemy.mesh.lookAt(nextPos.x, enemy.mesh.position.y, nextPos.z);
-
-    const hpRatio = enemy.hp / enemy.maxHp;
-    const hpBar = enemy.mesh.userData.hpBar;
-    if (hpBar) {
-      hpBar.scale.x = hpRatio;
-      hpBar.position.x = -(1 - hpRatio) * 0.5;
-      hpBar.material.color.setHex(hpRatio > 0.5 ? 0x44ff44 : hpRatio > 0.25 ? 0xffaa00 : 0xff4444);
-    }
-    const hpBg = enemy.mesh.userData.hpBg;
-    if (hpBg) {
-      hpBg.lookAt(camera.position);
-    }
-    if (hpBar) {
-      hpBar.lookAt(camera.position);
+    } else if (enemy.dead) {
+      // If it became dead through update but not t>=1 (should not happen normally with this flow but for safety)
+      scene.remove(enemy.mesh);
     }
   });
 

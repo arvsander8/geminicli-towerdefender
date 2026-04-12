@@ -2,7 +2,7 @@ import { PATH_NODES } from '../maps/map2.js';
 
 export const level2 = {
   id: 2,
-  name: 'Snake Path',
+  name: 'Edited Path',
   map: {
     pathNodes: PATH_NODES
   },
